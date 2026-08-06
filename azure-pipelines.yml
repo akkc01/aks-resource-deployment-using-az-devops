@@ -47,7 +47,7 @@ stages:
               action: deploy
               connectionType: Kubernetes Service Connection
               kubernetesServiceConnection: dev-connection
-              namespace: cicd-dev
+              namespace: dev
               manifests: |
                 $(Build.SourcesDirectory)/manifests/infra/infra-configmap.yaml
                 $(Build.SourcesDirectory)/manifests/infra/infra-deploy.yaml
