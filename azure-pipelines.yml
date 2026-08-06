@@ -1,11 +1,33 @@
-
 trigger: none
 
-pool: dev-aks-akkc-agent
-
+pool:
+  name: dev-aks-akkc-agent
 
 stages:
+
+# ==========================
+# Test Stage
+# ==========================
+- stage: Test
+  displayName: Test Stage
+  jobs:
+  - job: Test
+    displayName: Test Pipeline
+    steps:
+    - checkout: self
+    - script: |
+        echo "Deployment Starting..."
+        ls -R $(Build.SourcesDirectory)
+      displayName: Verify Repository
+
+# ==========================
+# Deploy Stage
+# ==========================
 - stage: Deploy
+  displayName: Deploy to AKS
+  dependsOn: Test
+  condition: succeeded()
+
   jobs:
   - deployment: DeployToAKS
     displayName: Deploy to AKS
@@ -17,7 +39,10 @@ stages:
         deploy:
           steps:
 
+          - checkout: self
+
           - task: KubernetesManifest@1
+            displayName: Deploy Manifests
             inputs:
               action: deploy
               connectionType: Kubernetes Service Connection
@@ -28,5 +53,3 @@ stages:
                 $(Build.SourcesDirectory)/manifests/svc.yaml
                 $(Build.SourcesDirectory)/manifests/configmap.yaml
                 $(Build.SourcesDirectory)/manifests/agic-ingress.yaml
-
-
