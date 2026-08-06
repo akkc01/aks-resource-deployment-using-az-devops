@@ -1,0 +1,34 @@
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+
+stages:
+- stage: Deploy
+
+  jobs:
+
+  - deployment: DeployToAKS
+
+    displayName: Deploy to AKS
+
+    environment: dev
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+
+          - task: KubernetesManifest@1
+            inputs:
+              action: deploy
+              connectionType: Kubernetes Service Connection
+              kubernetesServiceConnection: dev-connection
+              namespace: cicd-dev
+              manifests: |
+                $(Build.SourcesDirectory)/manifests/deployment.yaml
+                $(Build.SourcesDirectory)/manifests/service.yaml
+
+
