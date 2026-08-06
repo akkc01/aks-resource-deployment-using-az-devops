@@ -7,11 +7,8 @@ pool:
 
 stages:
 - stage: Deploy
-
   jobs:
-
   - deployment: DeployToAKS
-
     displayName: Deploy to AKS
 
     environment: dev
