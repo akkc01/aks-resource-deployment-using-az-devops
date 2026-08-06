@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infra-html
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Infra App</title>
+      <style>
+        body {
+          font-family: Arial;
+          text-align: center;
+          margin-top: 100px;
+          background-color: #f5f5f5;
+        }
+        h1 {
+          color: blue;
+          font-size: 50px;
+        }
+        h2 {
+          color: red;
+          font-size: 30px;
+        }
+        p {
+          font-size: 25px;
+          color: green;
+        }
+      </style>
+    </head>
+
+    <body>
+      <h1>Hello My Dear Friend</h1>
+      <h2>Happy Coding! and Happy Friendship Day!</h2>
+      <p>Welcome to Akkc Infra Services From AGIC Path-Based Ingress</p>
+    </body>
+    </html>
