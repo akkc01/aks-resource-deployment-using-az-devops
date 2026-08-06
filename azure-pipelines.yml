@@ -58,4 +58,4 @@ stages:
                 $(Build.SourcesDirectory)/manifests/stg/stg-svc.yaml
                 $(Build.SourcesDirectory)/manifests/stg/stg-configmap.yaml
                 $(Build.SourcesDirectory)/manifests/stg/stg-deploy.yaml
-                $(Build.SourcesDirectory)/ingress.yaml
+                $(Build.SourcesDirectory)/manifests/ingress.yaml
