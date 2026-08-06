@@ -1,8 +1,7 @@
 
 trigger: none
 
-pool:
-  vmImage: ubuntu-latest
+pool: dev-aks-akkc-agent
 
 
 stages:
@@ -25,7 +24,9 @@ stages:
               kubernetesServiceConnection: dev-connection
               namespace: cicd-dev
               manifests: |
-                $(Build.SourcesDirectory)/manifests/deployment.yaml
-                $(Build.SourcesDirectory)/manifests/service.yaml
+                $(Build.SourcesDirectory)/manifests/deployments.yaml
+                $(Build.SourcesDirectory)/manifests/svc.yaml
+                $(Build.SourcesDirectory)/manifests/configmap.yaml
+                $(Build.SourcesDirectory)/manifests/agic-ingress.yaml
 
 
