@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stg-app-html
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>STG App</title>
+      <style>
+        body {
+          font-family: Arial;
+          text-align: center;
+          margin-top: 100px;
+          background-color: #f5f5f5;
+        }
+        h1 {
+          color: blue;
+          font-size: 50px;
+        }
+        p {
+          font-size: 25px;
+          color: green;
+        }
+      </style>
+    </head>
+
+    <body>
+      <h1>Hello My Dear Friend</h1>
+      <p>Welcome to Rahul Infra STG Services from Nginx Ingress Controller Path-Based Ingress</p>
+    </body>
+    </html>

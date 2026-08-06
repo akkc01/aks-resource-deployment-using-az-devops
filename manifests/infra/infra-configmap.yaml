@@ -19,10 +19,6 @@ data:
           color: blue;
           font-size: 50px;
         }
-        h2 {
-          color: red;
-          font-size: 30px;
-        }
         p {
           font-size: 25px;
           color: green;
@@ -32,7 +28,6 @@ data:
 
     <body>
       <h1>Hello My Dear Friend</h1>
-      <h2>Happy Coding! and Happy Friendship Day!</h2>
-      <p>Welcome to Akkc Infra Services From AGIC Path-Based Ingress</p>
+      <p>Welcome to Rahul Infra Page from Nginx Ingress Controller Path-Based Ingress</p>
     </body>
     </html>

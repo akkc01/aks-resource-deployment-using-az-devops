@@ -49,7 +49,13 @@ stages:
               kubernetesServiceConnection: dev-connection
               namespace: cicd-dev
               manifests: |
-                $(Build.SourcesDirectory)/manifests/deployments.yaml
-                $(Build.SourcesDirectory)/manifests/svc.yaml
-                $(Build.SourcesDirectory)/manifests/configmap.yaml
-                $(Build.SourcesDirectory)/manifests/agic-ingress.yaml
+                $(Build.SourcesDirectory)/manifests/infra/infra-configmap.yaml
+                $(Build.SourcesDirectory)/manifests/infra/infra-deploy.yaml
+                $(Build.SourcesDirectory)/manifests/infra/infra-svc.yaml
+                $(Build.SourcesDirectory)/manifests/vm/vm-svc.yaml
+                $(Build.SourcesDirectory)/manifests/vm/vm-configmap.yaml
+                $(Build.SourcesDirectory)/manifests/vm/vm-deploy.yaml
+                $(Build.SourcesDirectory)/manifests/stg/stg-svc.yaml
+                $(Build.SourcesDirectory)/manifests/stg/stg-configmap.yaml
+                $(Build.SourcesDirectory)/manifests/stg/stg-deploy.yaml
+                $(Build.SourcesDirectory)/ingress.yaml
