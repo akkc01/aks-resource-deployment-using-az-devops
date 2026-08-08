@@ -1,13 +1,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vm-app-html
+  name: {{ .Release.Name }}-configmap
+  labels:
+    app: {{ .Release.Name }}-app-config
 data:
   index.html: |
     <!DOCTYPE html>
     <html>
     <head>
-      <title>VM App</title>
+      <title>Support App</title>
       <style>
         body {
           font-family: Arial;
@@ -28,6 +30,6 @@ data:
 
     <body>
       <h1>Hello My Dear Friend</h1>
-      <p>Welcome to Rahul Infra VM Services from Nginx Ingress Controller Path-Based Ingress</p>
+      <p>Welcome to The Akkc Space Support Services from Nginx Ingress Controller Path-Based Ingress</p>
     </body>
     </html>

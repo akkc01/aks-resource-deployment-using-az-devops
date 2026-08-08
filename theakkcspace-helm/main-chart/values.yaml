@@ -1,0 +1,37 @@
+replicaCount: 1
+
+image:
+  repository: amitkkc01/akkcmain
+  tag: latest
+  pullPolicy: IfNotPresent
+
+container:
+  name: main-app-container
+  port: 80
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+
+volume:
+  name: main-html
+  mountPath: /usr/share/nginx/html
+
+configMap:
+  suffix: configmap
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"

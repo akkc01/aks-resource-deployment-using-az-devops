@@ -1,5 +1,6 @@
-trigger: none
+name: Deploy-multiple-charts_$(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
 
+trigger: none
 pool:
   name: dev-aks-akkc-agent
 
@@ -7,7 +8,6 @@ stages:
 
 # ==========================
 # Test Stage
-# ==========================
 - stage: Test
   displayName: Test Stage
   jobs:
@@ -21,41 +21,20 @@ stages:
       displayName: Verify Repository
 
 # ==========================
-# Deploy Stage
-# ==========================
-- stage: Deploy
-  displayName: Deploy to AKS
-  dependsOn: Test
-  condition: succeeded()
-
+# Build Stage
+- stage: Build
   jobs:
-  - deployment: DeployToAKS
-    displayName: Deploy to AKS
+  - job: Build
+    steps:
 
-    environment: dev
+      - script: |
+          docker build -t myacr.azurecr.io/main:$(Build.BuildId) .
+          docker push myacr.azurecr.io/main:$(Build.BuildId)
 
-    strategy:
-      runOnce:
-        deploy:
-          steps:
+      - script: |
+          sed -i "s/tag:.*/tag: $(Build.BuildId)/" values.yaml
 
-          - checkout: self
-
-          - task: KubernetesManifest@1
-            displayName: Deploy Manifests
-            inputs:
-              action: deploy
-              connectionType: Kubernetes Service Connection
-              kubernetesServiceConnection: dev-connection
-              namespace: dev
-              manifests: |
-                $(Build.SourcesDirectory)/manifests/infra/infra-configmap.yaml
-                $(Build.SourcesDirectory)/manifests/infra/infra-deploy.yaml
-                $(Build.SourcesDirectory)/manifests/infra/infra-svc.yaml
-                $(Build.SourcesDirectory)/manifests/vm/vm-svc.yaml
-                $(Build.SourcesDirectory)/manifests/vm/vm-configmap.yaml
-                $(Build.SourcesDirectory)/manifests/vm/vm-deploy.yaml
-                $(Build.SourcesDirectory)/manifests/stg/stg-svc.yaml
-                $(Build.SourcesDirectory)/manifests/stg/stg-configmap.yaml
-                $(Build.SourcesDirectory)/manifests/stg/stg-deploy.yaml
-                $(Build.SourcesDirectory)/manifests/ingress.yaml
+      - script: |
+          git add .
+          git commit -m "Update image tag to $(Build.BuildId)"
+          git push

@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: Main-App
+  
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/akkc01/aks-helm-argocd-deployment.git
+    targetRevision: main
+    path: theakkcspace-helm/main-chart
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ .Release.Name }}-deployment
+  labels:
+    app: {{ .Release.Name }}-app-deploy
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app
+
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-app
+
+    spec:
+      containers:
+        - name: {{ .Values.container.name }}
+
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - containerPort: {{ .Values.container.port }}
+
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+
+          volumeMounts:
+            - name: {{ .Values.volume.name }}
+              mountPath: {{ .Values.volume.mountPath }}
+
+      volumes:
+        - name: {{ .Values.volume.name }}
+          configMap:
+            name: {{ .Release.Name }}-{{ .Values.configMap.suffix }}
