@@ -28,10 +28,13 @@ stages:
       displayName: "Checkout Repository"
 
     # Install Terraform
-    - task: TerraformInstaller@1
-      displayName: "Install Terraform"
-      inputs:
-        terraformVersion: "1.16.2"
+    - script: |
+        echo "Terraform path:"
+        which terraform
+
+        echo "Terraform version:"
+        terraform version
+      displayName: "Verify Terraform"
 
     # Verify Terraform
     - script: |
@@ -54,7 +57,6 @@ stages:
         provider: "azurerm"
         command: "init"
         workingDirectory: "$(System.DefaultWorkingDirectory)/env/dev"
-
         backendServiceArm: "azure-ado-sc-unnaoit"
         backendAzureRmResourceGroupName: "akkc"
         backendAzureRmStorageAccountName: "azureadostgtest01"
