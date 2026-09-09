@@ -60,8 +60,6 @@ stages:
           displayName: 'Terraform initialization'
 
 
-
-
         - task: TerraformTask@5
           displayName: "Terraform Validate"
           inputs:
@@ -72,13 +70,10 @@ stages:
             terraform fmt -check -recursive
           displayName: "Terraform formatting check"
 
-        - task: TerraformTask@5
+        - script: |
+            cd "$(System.DefaultWorkingDirectory)/env/dev"
+            terraform plan
           displayName: "Terraform Plan"
-          inputs:
-            provider: 'azurerm'
-            command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-            environmentServiceNameAzureRM: 'azure-ado-sc-unnaoit'
 
   - stage: terraform_apply
     dependsOn: terraform_install_init_plan
