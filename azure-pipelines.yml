@@ -22,6 +22,10 @@ stages:
         #   inputs:
         #     terraformVersion: 'latest'
 
+
+        - checkout: self
+          displayName: "Checkout Repository"
+          
         - task: TerraformInstaller@1
           displayName: 'Install Terraform'
           inputs:
