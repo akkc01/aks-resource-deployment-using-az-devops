@@ -27,6 +27,13 @@ stages:
           inputs:
             terraformVersion: '1.16.2'
 
+        # 2. Verify Terraform
+        - script: |
+            which terraform
+            terraform version
+            file "$(which terraform)"
+          displayName: 'Verify Terraform'
+
         - task: TerraformTask@5
           displayName: "Terraform initialization"
           inputs:
