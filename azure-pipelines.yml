@@ -73,6 +73,35 @@ stages:
         terraform fmt -check -recursive
       displayName: "Terraform Format Check"
 
+    - script: |
+        set -ex
+
+        echo "PWD:"
+        pwd
+
+        echo "System.DefaultWorkingDirectory:"
+        echo "$(System.DefaultWorkingDirectory)"
+
+        echo "Directory:"
+        ls -la "$(System.DefaultWorkingDirectory)"
+
+        echo "env:"
+        ls -la "$(System.DefaultWorkingDirectory)/env"
+
+        echo "dev:"
+        ls -la "$(System.DefaultWorkingDirectory)/env/dev"
+
+        echo "Terraform files:"
+        find "$(System.DefaultWorkingDirectory)/env/dev" -maxdepth 1 -name "*.tf" -print
+
+        cd "$(System.DefaultWorkingDirectory)/env/dev"
+
+        echo "After CD:"
+        pwd
+
+        terraform plan
+      displayName: "Terraform Plan"
+
     # Terraform Plan
     - script: |
         cd "$(System.DefaultWorkingDirectory)/env/dev"
