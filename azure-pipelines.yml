@@ -50,6 +50,36 @@ stages:
         file "$(which terraform)"
       displayName: "Verify Terraform"
 
+
+    - script: |
+        echo "===== USER ====="
+        whoami
+
+        echo "===== HOME ====="
+        echo "$HOME"
+
+        echo "===== PATH ====="
+        echo "$PATH"
+
+        echo "===== TERRAFORM ====="
+        which terraform || true
+
+        echo "===== TERRAFORM FILE ====="
+        ls -la /opt/homebrew/bin/terraform || true
+
+        echo "===== FILE TYPE ====="
+        file /opt/homebrew/bin/terraform || true
+
+        echo "===== PERMISSION ====="
+        stat /opt/homebrew/bin/terraform || true
+
+        echo "===== DIRECT EXECUTION ====="
+        /opt/homebrew/bin/terraform version || true
+
+        echo "===== ARCH ====="
+        uname -m
+      displayName: "Debug Terraform Agent Environment"
+
     # Terraform Init
     - task: TerraformTask@5
       displayName: "Terraform Initialization"
