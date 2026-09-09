@@ -18,9 +18,14 @@ stages:
       - job: terraform_install_and_init
         displayName: "terraform init job"
         steps:
+        # - task: TerraformInstaller@1
+        #   inputs:
+        #     terraformVersion: 'latest'
+
         - task: TerraformInstaller@1
+          displayName: 'Install Terraform'
           inputs:
-            terraformVersion: 'latest'
+            terraformVersion: '1.16.2'
 
         - task: TerraformTask@5
           displayName: "Terraform initialization"
