@@ -1,116 +1,135 @@
-name: build pipeline
+name: build-pipeline
 
 trigger:
- branches:
-  include:
-    - main
-#    - features/*
+  branches:
+    include:
+      - main
+#     - features/*
 
 pool:
- name: dev-aks-akkc-agent
-
+  name: dev-aks-akkc-agent
 
 stages:
-  - stage: terraform_install_init_plan
-    displayName: "Terraform install and init stage"
 
-    jobs:
-      - job: terraform_install_and_init
-        displayName: "terraform init job"
-        steps:
-        # - task: TerraformInstaller@1
-        #   inputs:
-        #     terraformVersion: 'latest'
+# ============================================================
+# Stage 1: Terraform Install + Init + Validate + Format + Plan
+# ============================================================
+- stage: terraform_install_init_plan
+  displayName: "Terraform Install, Init and Plan"
+
+  jobs:
+  - job: terraform_install_and_init
+    displayName: "Terraform Init and Plan"
+
+    steps:
+
+    # Checkout repository
+    - checkout: self
+      displayName: "Checkout Repository"
+
+    # Install Terraform
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: "1.16.2"
+
+    # Verify Terraform
+    - script: |
+        echo "Terraform location:"
+        which terraform
+
+        echo ""
+        echo "Terraform version:"
+        terraform version
+
+        echo ""
+        echo "Terraform binary:"
+        file "$(which terraform)"
+      displayName: "Verify Terraform"
+
+    # Terraform Init
+    - task: TerraformTask@5
+      displayName: "Terraform Initialization"
+      inputs:
+        provider: "azurerm"
+        command: "init"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/env/dev"
+
+        backendServiceArm: "azure-ado-sc-unnaoit"
+        backendAzureRmResourceGroupName: "akkc"
+        backendAzureRmStorageAccountName: "azureadostgtest01"
+        backendAzureRmContainerName: "terraformstate"
+        backendAzureRmKey: "dev.terraform.tfstate"
+
+    # Terraform Validate
+    - task: TerraformTask@5
+      displayName: "Terraform Validate"
+      inputs:
+        provider: "azurerm"
+        command: "validate"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/env/dev"
+
+    # Terraform Format Check
+    - script: |
+        cd "$(System.DefaultWorkingDirectory)/env/dev"
+
+        terraform fmt -check -recursive
+      displayName: "Terraform Formatting Check"
+
+    # Terraform Plan
+    - task: TerraformTask@5
+      displayName: "Terraform Plan"
+      inputs:
+        provider: "azurerm"
+        command: "plan"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/env/dev"
+        environmentServiceNameAzureRM: "azure-ado-sc-unnaoit"
 
 
-        - checkout: self
-          displayName: "Checkout Repository"
+# ============================================================
+# Stage 2: Terraform Apply
+# ============================================================
+- stage: terraform_apply
+  dependsOn: terraform_install_init_plan
+  condition: succeeded()
+  displayName: "Terraform Apply"
 
-        - task: TerraformInstaller@1
-          displayName: 'Install Terraform'
-          inputs:
-            terraformVersion: '1.16.2'
+  jobs:
+  - job: terraform_apply
+    displayName: "Terraform Apply Job"
 
-        # 2. Verify Terraform
-        - script: |
-            which terraform
-            terraform version
-            file "$(which terraform)"
-          displayName: 'Verify Terraform'
+    steps:
 
-        # - script: |
-        #     echo "Terraform directory:"
-        #     ls -la "$(System.DefaultWorkingDirectory)/env/dev"
+    # Checkout repository
+    - checkout: self
+      displayName: "Checkout Repository"
 
-        #     echo "Terraform files:"
-        #     find "$(System.DefaultWorkingDirectory)/env/dev" -maxdepth 1 -name "*.tf" -print
-        #   displayName: "Verify Terraform Working Directory"
+    # Install Terraform again
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: "1.16.2"
 
-        - task: TerraformTask@5
-          displayName: "Terraform initialization"
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-            backendServiceArm: 'azure-ado-sc-unnaoit'
-            backendAzureRmResourceGroupName: 'akkc'
-            backendAzureRmStorageAccountName: 'azureadostgtest01'
-            backendAzureRmContainerName: 'terraformstate'
-            backendAzureRmKey: 'dev.terraform.tfstate'
-        
+    # Terraform Init
+    - task: TerraformTask@5
+      displayName: "Terraform Initialization"
+      inputs:
+        provider: "azurerm"
+        command: "init"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/env/dev"
 
-        # - script: |
-        #     terraform version
+        backendServiceArm: "azure-ado-sc-unnaoit"
+        backendAzureRmResourceGroupName: "akkc"
+        backendAzureRmStorageAccountName: "azureadostgtest01"
+        backendAzureRmContainerName: "terraformstate"
+        backendAzureRmKey: "dev.terraform.tfstate"
 
-        #     terraform init \
-        #       -backend-config="storage_account_name=azureadostgtest01" \
-        #       -backend-config="container_name=terraformstate" \
-        #       -backend-config="key=dev.terraform.tfstate" \
-        #       -backend-config="resource_group_name=akkc" \
-        #       -backend-config="subscription_id=b8e77924-89da-41ce-8257-846989faab77" \
-        #       -backend-config="use_azuread_auth=true"
-        #   displayName: 'Terraform initialization'
-
-
-        - task: TerraformTask@5
-          displayName: "Terraform Validate"
-          inputs:
-            provider: 'azurerm'
-            command: 'validate'
-
-        - script: |
-            terraform fmt -check -recursive
-          displayName: "Terraform formatting check"
-
-        - script: |
-            cd "$(System.DefaultWorkingDirectory)/env/dev"
-            terraform plan
-          displayName: "Terraform Plan"
-
-  - stage: terraform_apply
-    dependsOn: terraform_install_init_plan
-    displayName: "Terraform Apply Stage"
-    jobs:
-      - job: terraform_apply
-        displayName: "Terraform apply jobs"
-        steps:
-        - task: TerraformTask@5
-          displayName: "Terraform initialization"
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-            backendServiceArm: 'azure-ado-sc-unnaoit'
-            backendAzureRmResourceGroupName: 'akkc'
-            backendAzureRmStorageAccountName: 'azureadostgtest01'
-            backendAzureRmContainerName: 'terraformstate'
-            backendAzureRmKey: 'dev.terraform.tfstate'
-        
-
-        - task: TerraformTask@5
-          inputs:
-            provider: 'azurerm'
-            command: 'apply'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-            commandOptions: '--auto-approve'
-            environmentServiceNameAzureRM: 'azure-ado-sc-unnaoit'
+    # Terraform Apply
+    - task: TerraformTask@5
+      displayName: "Terraform Apply"
+      inputs:
+        provider: "azurerm"
+        command: "apply"
+        workingDirectory: "$(System.DefaultWorkingDirectory)/env/dev"
+        commandOptions: "--auto-approve"
+        environmentServiceNameAzureRM: "azure-ado-sc-unnaoit"
