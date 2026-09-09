@@ -34,18 +34,34 @@ stages:
             file "$(which terraform)"
           displayName: 'Verify Terraform'
 
-        - task: TerraformTask@5
-          displayName: "Terraform initialization"
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-            backendServiceArm: 'azure-ado-sc-unnaoit'
-            backendAzureRmResourceGroupName: 'akkc'
-            backendAzureRmStorageAccountName: 'azureadostgtest01'
-            backendAzureRmContainerName: 'terraformstate'
-            backendAzureRmKey: 'dev.terraform.tfstate'
+        # - task: TerraformTask@5
+        #   displayName: "Terraform initialization"
+        #   inputs:
+        #     provider: 'azurerm'
+        #     command: 'init'
+        #     workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+        #     backendServiceArm: 'azure-ado-sc-unnaoit'
+        #     backendAzureRmResourceGroupName: 'akkc'
+        #     backendAzureRmStorageAccountName: 'azureadostgtest01'
+        #     backendAzureRmContainerName: 'terraformstate'
+        #     backendAzureRmKey: 'dev.terraform.tfstate'
         
+
+        - script: |
+            terraform version
+
+            terraform init \
+              -backend-config="storage_account_name=azureadostgtest01" \
+              -backend-config="container_name=terraformstate" \
+              -backend-config="key=dev.terraform.tfstate" \
+              -backend-config="resource_group_name=akkc" \
+              -backend-config="subscription_id=b8e77924-89da-41ce-8257-846989faab77" \
+              -backend-config="use_azuread_auth=true"
+          displayName: 'Terraform initialization'
+
+
+
+
         - task: TerraformTask@5
           displayName: "Terraform Validate"
           inputs:
