@@ -68,14 +68,9 @@ stages:
             provider: 'azurerm'
             command: 'validate'
 
-        - task: TerraformTask@5
-          displayName: "Terraform formatting"
-          inputs:
-            provider: 'azurerm'
-            command: 'custom'
-            customCommand: 'fmt --recursive'
-            outputTo: 'console'
-            environmentServiceNameAzureRM: 'azure-ado-sc-unnaoit'
+        - script: |
+            terraform fmt -check -recursive
+          displayName: "Terraform formatting check"
 
         - task: TerraformTask@5
           displayName: "Terraform Plan"
